@@ -4,7 +4,7 @@ interface DeviceName {
   /**
    * List of names provided by the partner rather than the user, often manufacturer names, SKUs, etc.s
    */
-  defaultNames?: string[];
+  defaultNames: string[];
 
   /**
    * Primary name of the device, generally provided by the user.
@@ -15,5 +15,5 @@ interface DeviceName {
   /**
    * Additional names provided by the user for the device.
    */
-  nicknames?: string[];
+  nicknames: string[];
 }

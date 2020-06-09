@@ -28,7 +28,7 @@ export class SmartHomeController<T extends BaseDevice<Traits[]>[]> {
 
   public smartHome: AppHandler & SmartHomeApp;
 
-  public static async createController<T>({
+  public static async createController<T extends BaseDevice<Traits[]>[]>({
     devices,
   }: CreateControllerOptions<T>): Promise<SmartHomeController<T>> {
     const smartHome = smarthome();
@@ -49,40 +49,42 @@ export class SmartHomeController<T extends BaseDevice<Traits[]>[]> {
     headers: Headers,
     framework?: BuiltinFrameworkMetadata,
   ): Promise<SmartHomeV1ExecuteResponse> {
-    console.log('onExecute. body: ', body.inputs);
+    const commands = await Promise.all(
+      body.inputs.flatMap((execInput) => {
+        return execInput.payload.commands.flatMap(({ devices, execution }) => {
+          return devices.flatMap<Promise<SmartHomeV1ExecuteResponseCommands>>(
+            async ({ id }) => {
+              const localDevice = this.devices.find(
+                (device) => device.id === id,
+              );
+              if (!localDevice) {
+                return {
+                  ids: [id],
+                  status: 'ERROR',
+                  errorCode: 'DEVICE_NOT_FOUND',
+                };
+              }
 
-    const output = await Promise.all(
-      body.inputs.map((execInput) => {
-        return execInput.payload.commands.map(({ devices, execution }) => {
-          const smartHomeDevices = devices.map<
-            SmartHomeV1ExecuteResponseCommands
-          >(({ id }) => {
-            const localDevice = this.devices.find((device) => device.id === id);
-            if (!localDevice) {
+              await Promise.all(
+                localDevice.commands.map(async (deviceCmd) => {
+                  const exec = execution.find(
+                    ({ command }) => command === deviceCmd.type,
+                  );
+                  if (!exec) {
+                    return;
+                  }
+                  Object.assign(deviceCmd, exec.params);
+
+                  await localDevice.executeCommand(deviceCmd);
+                }),
+              );
+
               return {
                 ids: [id],
-                status: 'ERROR',
-                errorCode: 'DEVICE_NOT_FOUND',
+                status: 'SUCCESS',
               };
-            }
-
-            localDevice.commands.map((deviceCmd) => {
-              const exec = execution.find(
-                ({ command }) => command === deviceCmd.type,
-              );
-              if (!exec) {
-                return;
-              }
-              Object.assign(deviceCmd, exec.params);
-
-              localDevice.executeCommand(deviceCmd);
-            });
-
-            return {
-              ids: [id],
-              status: 'SUCCESS',
-            };
-          });
+            },
+          );
         });
       }),
     );
@@ -90,7 +92,7 @@ export class SmartHomeController<T extends BaseDevice<Traits[]>[]> {
     return {
       requestId: body.requestId,
       payload: {
-        commands: [],
+        commands,
       },
     };
   }
@@ -100,22 +102,21 @@ export class SmartHomeController<T extends BaseDevice<Traits[]>[]> {
     headers: Headers,
     framework?: BuiltinFrameworkMetadata,
   ): Promise<SmartHomeV1QueryResponse> {
-    body.inputs.map((queryInput) => {
-      console.log(queryInput.payload);
-    });
+    const devicePromises = body.inputs.flatMap(({ intent, payload }) =>
+      payload.devices.map(async ({ id }) => {
+        const localDevice = this.devices.find((device) => device.id === id);
+        if (!localDevice) {
+          return [];
+        }
 
-    const devices = Object.fromEntries(
-      await Promise.all(
-        this.devices.map(async ({ getStatus, traits, ...device }) => {
-          return [device.id, await getStatus()];
-        }),
-      ),
+        return [id, await localDevice.getStatus()] as [string, unknown];
+      }),
     );
 
     return {
       requestId: body.requestId,
       payload: {
-        devices,
+        devices: Object.fromEntries(await Promise.all(devicePromises)),
       },
     };
   }

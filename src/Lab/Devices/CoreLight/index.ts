@@ -2,12 +2,20 @@
 import { BaseDevice } from '../../../Modules/Device/BaseDevice';
 import { DeviceType } from '../../../Modules/Device/Device';
 import { OnOffTrait, BrightnessTrait } from '../../../Modules/Trait';
+import { DeviceInfo } from '../../../Modules/Device/DeviceInfo';
 
 let onStatus = true;
 let brightness = 50;
 
 export class CoreLight extends BaseDevice<CoreLight['traits']> {
   public id = '544845';
+
+  public deviceInfo: DeviceInfo = {
+    hwVersion: '0.0.0',
+    manufacturer: 'KJDev',
+    model: '0.0.1',
+    swVersion: '0.0.1',
+  };
 
   public name: BaseDevice<CoreLight['traits']>['name'] = {
     name: 'Core Light',
