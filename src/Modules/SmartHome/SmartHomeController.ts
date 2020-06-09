@@ -11,13 +11,15 @@ import {
   SmartHomeV1SyncDevices,
   SmartHomeV1SyncRequest,
   SmartHomeV1SyncResponse,
+  SmartHomeV1DisconnectResponse,
+  SmartHomeV1DisconnectRequest,
 } from 'actions-on-google';
 import type {
   BuiltinFrameworkMetadata,
   Headers,
 } from 'actions-on-google/dist/framework';
 import { BaseDevice } from '../Device';
-import { Traits } from '../Trait/TraitClass';
+import { Traits } from '../Trait';
 
 interface CreateControllerOptions<T> {
   devices: T;
@@ -42,6 +44,9 @@ export class SmartHomeController<
     smartHome.onSync((...args) => smartHomeController.onSync(...args));
     smartHome.onExecute((...args) => smartHomeController.onExecute(...args));
     smartHome.onQuery((...args) => smartHomeController.onQuery(...args));
+    smartHome.onDisconnect((...args) =>
+      smartHomeController.onDisconnect(...args),
+    );
 
     return smartHomeController;
   }
@@ -127,6 +132,23 @@ export class SmartHomeController<
     };
   }
 
+  public async onDisconnect(
+    body: SmartHomeV1DisconnectRequest,
+    headers: Headers,
+    framework?: BuiltinFrameworkMetadata,
+  ): Promise<SmartHomeV1DisconnectResponse> {
+    console.log(
+      'onDisconnect: body: ',
+      body,
+      `headers: `,
+      headers,
+      'framework: ',
+      framework,
+    );
+
+    return {};
+  }
+
   public async onSync(
     body: SmartHomeV1SyncRequest,
     headers: Headers,
@@ -141,6 +163,8 @@ export class SmartHomeController<
         };
       },
     );
+
+    console.log('onSync: ', devices);
 
     return {
       requestId: body.requestId,

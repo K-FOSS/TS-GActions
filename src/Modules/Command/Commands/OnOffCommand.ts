@@ -1,8 +1,15 @@
 // src/Modules/Commands/Commands/OnOffCommand.ts
-import { BaseComamnd } from '../BaseCommand';
+import { BaseComamnd, CommandType } from '../BaseCommand';
 
+/**
+ *
+ * https://developers.google.com/assistant/smarthome/traits/onoff#device-commands
+ */
 export class OnOffCommand extends BaseComamnd {
-  public type = 'action.devices.commands.OnOff' as const;
+  public type = CommandType.OnOff as const;
 
-  public on = true;
+  /**
+   * Whether to turn the device on or off.
+   */
+  public on: boolean;
 }

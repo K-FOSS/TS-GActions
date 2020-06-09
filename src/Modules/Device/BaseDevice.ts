@@ -1,6 +1,6 @@
 // src/Modules/Device/BaseDevice.ts
 import { ObjectGet } from '../../Utils/types';
-import { Traits } from '../Trait/TraitClass';
+import { Traits } from '../Trait';
 import { DeviceType } from './Device';
 import { DeviceInfo } from './DeviceInfo';
 

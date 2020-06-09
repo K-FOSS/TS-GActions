@@ -19,7 +19,12 @@
 
     // Features
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+
+    "baseUrl": "./src",
+    "paths": {
+      "@k-foss/ts-gactions/*": ["./*"]
+    }
   },
   "include": ["src/**/*.ts"]
 }
