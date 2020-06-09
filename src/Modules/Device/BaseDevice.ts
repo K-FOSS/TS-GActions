@@ -3,7 +3,6 @@ import { ObjectGet } from '../../Utils/types';
 import { Traits } from '../Trait/TraitClass';
 import { DeviceType } from './Device';
 import { DeviceInfo } from './DeviceInfo';
-import { Command } from '../Command/Command';
 
 export abstract class BaseDevice<T extends ReadonlyArray<Traits>> {
   public id: string;
@@ -16,10 +15,6 @@ export abstract class BaseDevice<T extends ReadonlyArray<Traits>> {
    * Names of this device.
    */
   public abstract name: DeviceName;
-
-  public get commands(): Command[] {
-    return this.traits.flatMap(({ commands }) => commands);
-  }
 
   /**
    * Contains fields describing the device for use in

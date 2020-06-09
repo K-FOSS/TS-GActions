@@ -23,7 +23,9 @@ interface CreateControllerOptions<T> {
   devices: T;
 }
 
-export class SmartHomeController<T extends BaseDevice<Traits[]>[]> {
+export class SmartHomeController<
+  T extends BaseDevice<ReadonlyArray<Traits>>[]
+> {
   public devices: T;
 
   public smartHome: AppHandler & SmartHomeApp;
@@ -65,19 +67,23 @@ export class SmartHomeController<T extends BaseDevice<Traits[]>[]> {
                 };
               }
 
-              await Promise.all(
-                localDevice.commands.map(async (deviceCmd) => {
-                  const exec = execution.find(
-                    ({ command }) => command === deviceCmd.type,
-                  );
-                  if (!exec) {
-                    return;
-                  }
-                  Object.assign(deviceCmd, exec.params);
+              const commands = localDevice.traits
+                .map(({ commands }) => commands)
+                .flat(1);
 
-                  await localDevice.executeCommand(deviceCmd);
-                }),
-              );
+              for (const deviceCommand of commands) {
+                const exec = execution.find(
+                  ({ command }) => deviceCommand.type === command,
+                );
+                if (!exec) {
+                  continue;
+                }
+
+                Object.assign(deviceCommand, exec.params);
+
+                await localDevice.executeCommand(deviceCommand);
+                break;
+              }
 
               return {
                 ids: [id],

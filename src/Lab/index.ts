@@ -17,4 +17,4 @@ webServer.post('/fulfillment', smartHomeController.smartHome);
 
 await registerAuthEndpoints(webServer);
 
-await webServer.listen(3000);
+webServer.listen(3000);

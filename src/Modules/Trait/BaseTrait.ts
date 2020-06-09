@@ -1,9 +1,9 @@
 // src/Modules/Trait/BaseTrait.ts
 import { TraitType } from './TraitType';
-import { Command } from '../Command/Command';
+import { Commands } from '../Command/Commands';
 
 export abstract class BaseTrait {
-  public abstract commands: ReadonlyArray<Command>;
+  public abstract commands: ReadonlyArray<Commands>;
 
   public abstract type: TraitType;
 }

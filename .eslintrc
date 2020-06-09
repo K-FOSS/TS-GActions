@@ -24,7 +24,7 @@
         "varsIgnorePattern": "_.+"
       }
     ],
-    "@typescript-eslint/no-unused-vars-experimental": ["error"],
+    "@typescript-eslint/no-unused-vars-experimental": ["off"],
 
     "@typescript-eslint/require-await": "off",
 
@@ -34,6 +34,8 @@
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/brace-style.md
     "brace-style": "off",
     "@typescript-eslint/brace-style": ["error"],
+
+    "@typescript-eslint/no-unsafe-assignment": "off",
 
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-array-constructor.md
     "no-array-constructor": "off",

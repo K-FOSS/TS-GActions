@@ -25,7 +25,7 @@ export class CoreLight extends BaseDevice<CoreLight['traits']> {
 
   public type = DeviceType.LIGHT;
 
-  public traits = [new OnOffTrait(), new BrightnessTrait()] as const;
+  public traits = [new OnOffTrait(), new BrightnessTrait()];
 
   public getStatus: BaseDevice<CoreLight['traits']>['getStatus'] = async () => {
     return {
@@ -43,6 +43,7 @@ export class CoreLight extends BaseDevice<CoreLight['traits']> {
         break;
       case 'action.devices.commands.OnOff':
         onStatus = command.on;
+        break;
     }
   };
 }
