@@ -1,0 +1,30 @@
+version: '3.8'
+
+networks:
+  argoTunnel:
+
+volumes:
+  modules:
+
+services:
+  devContainer:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev
+    image: typescript-typeorm
+    networks:
+      - argoTunnel
+    volumes:
+      - ./:/workspace:cached
+      - modules:/workspace/node_modules
+
+  tunnel:
+    image: jakejarvis/cloudflare-argo
+    restart: unless-stopped
+    networks:
+      - argoTunnel
+    volumes:
+      - ./local/cert.pem:/etc/cloudflared/cert.pem
+    environment:
+      TUNNEL_HOSTNAME: 'gactions.kristianjones.dev'
+      TUNNEL_URL: 'http://devContainer:3000'

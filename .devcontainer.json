@@ -1,6 +1,10 @@
 {
-  "name": "TS-Core Container",
-  "dockerFile": "./Dockerfile.dev",
+  "name": "TS-GActions Container",
+  "dockerComposeFile": "./docker-compose.yml",
+  "service": "devContainer",
+  "workspaceFolder": "/workspace",
+  "runServices": ["devContainer", "tunnel"],
+
   "settings": {
     // This dev container does include /bin/bash if you prefer to use it instead of ash.
     "terminal.integrated.shell.linux": "/bin/sh"
@@ -10,12 +14,12 @@
     "SHELL": "/bin/sh"
   },
 
-  "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"],
-  "remoteUser": "node",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-  "workspaceFolder": "/workspace",
-  "mounts": [
-    "source=ts-core-modules,target=/workspace/node_modules,type=volume"
+  "extensions": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "visualstudioexptteam.vscodeintellicode"
   ],
+  "remoteUser": "node",
+
   "postCreateCommand": "sudo chown node node_modules && npm i"
 }

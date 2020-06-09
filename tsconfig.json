@@ -3,9 +3,12 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
 
     // Strict Rules
     "strict": true,
+    "strictNullChecks": true,
+    "noFallthroughCasesInSwitch": true,
     "alwaysStrict": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
