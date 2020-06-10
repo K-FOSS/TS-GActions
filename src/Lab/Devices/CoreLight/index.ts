@@ -1,32 +1,19 @@
 // src/Lab/Devices/CoreLight/index.ts
+import { CommandType } from '@k-foss/ts-gactions/Modules/Command/BaseCommand';
+import {
+  AppSelectorTrait,
+  BrightnessTrait,
+  OnOffTrait,
+} from '@k-foss/ts-gactions/Modules/Trait';
 import { BaseDevice } from '../../../Modules/Device/BaseDevice';
 import { DeviceType } from '../../../Modules/Device/Device';
-import {
-  OnOffTrait,
-  BrightnessTrait,
-  AppSelectorTrait,
-} from '@k-foss/ts-gactions/Modules/Trait';
 import { DeviceInfo } from '../../../Modules/Device/DeviceInfo';
-import { CommandType } from '@k-foss/ts-gactions/Modules/Command/BaseCommand';
-import { Application } from '@k-foss/ts-gactions/Modules/Trait/Traits/AppSelectorTrait';
 
-let onStatus = true;
-let brightness = 50;
-const availableApplications: Application[] = [
-  {
-    key: 'youtube',
-    names: [
-      {
-        name_synonym: ['Youtube', 'YouTube US'],
-        lang: 'en',
-      },
-      {
-        name_synonym: ['Youtube', 'YouTube DE'],
-        lang: 'de',
-      },
-    ],
-  },
-];
+interface CustomData {
+  brightness: number;
+
+  on: boolean;
+}
 
 export class CoreLight extends BaseDevice<CoreLight['traits']> {
   public id = '544845';
@@ -44,9 +31,17 @@ export class CoreLight extends BaseDevice<CoreLight['traits']> {
     nicknames: ['test'],
   };
 
-  public type = DeviceType.LIGHT;
+  public type = DeviceType.Light;
 
-  public attributes = {
+  public customData: CustomData = {
+    brightness: 50,
+    on: false,
+  };
+
+  public attributes: BaseDevice<CoreLight['traits']>['attributes'] = {
+    commandOnlyOnOff: false,
+    commandOnlyBrightness: false,
+    queryOnlyOnOff: false,
     availableApplications: [
       {
         key: 'youtube',
@@ -64,6 +59,8 @@ export class CoreLight extends BaseDevice<CoreLight['traits']> {
     ],
   };
 
+  public willReportState = true;
+
   public traits = [
     new OnOffTrait(),
     new BrightnessTrait(),
@@ -72,20 +69,8 @@ export class CoreLight extends BaseDevice<CoreLight['traits']> {
 
   public getStatus: BaseDevice<CoreLight['traits']>['getStatus'] = async () => {
     return {
-      on: onStatus,
-      brightness,
+      ...this.customData,
       currentApplication: '',
-
-      attributes: {
-        availableApplications,
-        commandOnlyBrightness: false,
-        commandOnlyOnOff: false,
-      },
-      /*
-      attributes: {
-        commandOnlyBrightness: true,
-        commandOnlyOnOff: false,
-      },  */
     };
   };
 
@@ -94,12 +79,10 @@ export class CoreLight extends BaseDevice<CoreLight['traits']> {
   >['executeCommand'] = async (command) => {
     switch (command.type) {
       case CommandType.BrightnessAbsolute:
-        console.log('Brightness', command);
-        brightness = command.brightness;
+        this.customData.brightness = command.brightness;
         break;
       case CommandType.OnOff:
-        console.log('OnOff: ', command);
-        onStatus = command.on;
+        this.customData.on = command.on;
         break;
       case CommandType.appInstall:
         console.log('Install Application ', command);

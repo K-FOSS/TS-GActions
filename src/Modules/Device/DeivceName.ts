@@ -1,5 +1,4 @@
 // src/Modules/Device/DeviceName.ts
-
 interface DeviceName {
   /**
    * List of names provided by the partner rather than the user, often manufacturer names, SKUs, etc.s

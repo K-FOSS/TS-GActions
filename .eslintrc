@@ -72,7 +72,7 @@
 
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-invalid-this.md
     "no-invalid-this": "off",
-    "@typescript-eslint/no-invalid-this": ["error"],
+    "@typescript-eslint/no-invalid-this": ["off"],
 
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-this-alias.md
     "@typescript-eslint/no-this-alias": [

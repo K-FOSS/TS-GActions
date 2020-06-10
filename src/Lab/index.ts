@@ -4,13 +4,14 @@ import { CoreLight } from './Devices/CoreLight';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { registerAuthEndpoints } from './Auth';
+import { Jumper } from './Devices/Jumper';
 
 const webServer = express();
 webServer.use(bodyParser.json());
 webServer.use(bodyParser.urlencoded({ extended: true }));
 
 const smartHomeController = await SmartHomeController.createController({
-  devices: [new CoreLight()],
+  devices: [new CoreLight(), new Jumper()],
 });
 
 webServer.post('/fulfillment', smartHomeController.smartHome);

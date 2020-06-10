@@ -1,7 +1,11 @@
 // src/Modules/Trait/Traits/TimerTrait.ts
 import { BaseTrait } from '../BaseTrait';
 import { TraitType } from '../TraitType';
-import { BrightnessAbsoluteCommand } from '../../Command/Commands/BrightnessAbsoluteCommand';
+import { TimerStartCommand } from '../../Command/Commands/TimerStartCommand';
+import { TimerPauseCommand } from '../../Command/Commands/TimerPauseCommand';
+import { TimerResumeCommand } from '../../Command/Commands/TimerResumeCommand';
+import { TimerCancelCommand } from '../../Command/Commands/TimerCancelCommand';
+import { TimerAdjustCommand } from '../../Command/Commands/TimerAdjustCommand';
 
 /**
  * https://developers.google.com/assistant/smarthome/traits/timer#device-attributes
@@ -33,7 +37,13 @@ export class TimerTrait extends BaseTrait {
 
   public attributes: Attributes;
 
-  public commands = [new BrightnessAbsoluteCommand()] as const;
+  public commands = [
+    new TimerStartCommand(),
+    new TimerPauseCommand(),
+    new TimerResumeCommand(),
+    new TimerCancelCommand(),
+    new TimerAdjustCommand(),
+  ] as const;
 
   /**
    * Current time remaining in seconds, -1 or [0, maxTimerLimitSec]. Set to -1 to indicate no timer is running.

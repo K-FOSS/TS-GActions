@@ -10,6 +10,20 @@ export enum CommandType {
   appInstall = 'action.devices.commands.appInstall',
   appSearch = 'action.devices.commands.appSearch',
   appSelect = 'action.devices.commands.appSelect',
+
+  /**
+   * https://developers.google.com/assistant/smarthome/traits/timer#device-commands
+   */
+  TimerStart = 'action.devices.commands.TimerStart',
+  TimerAdjust = 'action.devices.commands.TimerAdjust',
+  TimerPause = 'action.devices.commands.TimerPause',
+  TimerResume = 'action.devices.commands.TimerResume',
+  TimerCancel = 'action.devices.commands.TimerCancel',
+
+  /**
+   * https://developers.google.com/assistant/smarthome/traits/modes#device-commands
+   */
+  SetMode = 'action.devices.commands.SetModes',
 }
 
 export abstract class BaseComamnd {

@@ -117,6 +117,7 @@ export class SmartHomeController<
       payload.devices.map(async ({ id }) => {
         const localDevice = this.devices.find((device) => device.id === id);
         if (!localDevice) {
+          console.log(`Can't find ${id}`);
           return [];
         }
 
@@ -159,7 +160,6 @@ export class SmartHomeController<
         return {
           ...device,
           traits: traits.map(({ type }) => type),
-          willReportState: true,
         };
       },
     );

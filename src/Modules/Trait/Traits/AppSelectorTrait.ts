@@ -9,7 +9,7 @@ interface ApplicationName {
   /**
    * User-friendly synonyms for the application name for a given language. The first synonym is used in the response.
    */ // eslint-disable-next-line camelcase
-  name_synonym: string;
+  name_synonym: string[];
 
   lang: string;
 }
