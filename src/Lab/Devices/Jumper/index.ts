@@ -28,6 +28,8 @@ export class Jumper extends BaseDevice<Jumper['traits']> {
     swVersion: '0.0.1',
   };
 
+  public willReportState = true;
+
   public name: BaseDevice<Jumper['traits']>['name'] = {
     name: 'Jumper',
     defaultNames: ['Jumper'],
@@ -108,6 +110,7 @@ export class Jumper extends BaseDevice<Jumper['traits']> {
 
   public startTimer(timerTimeSec: number): void {
     this.customData.timerRemainingSec = timerTimeSec;
+    this.customData.timerPaused = false;
 
     this.startInterval();
   }
@@ -122,6 +125,8 @@ export class Jumper extends BaseDevice<Jumper['traits']> {
   }
 
   public pauseTimer(): void {
+    console.log('pause timer: ', this.customData);
+
     if (!this.customData.timer) {
       return;
     }
@@ -144,11 +149,14 @@ export class Jumper extends BaseDevice<Jumper['traits']> {
   >['executeCommand'] = async (command) => {
     switch (command.type) {
       case CommandType.TimerStart:
+        console.log('Start Timer: ', command);
+        this.startTimer(command.timerTimeSec);
         break;
       case CommandType.TimerCancel:
         this.stopTimer();
         break;
       case CommandType.TimerPause:
+        console.log('pause timer: ');
         this.pauseTimer();
         break;
       case CommandType.TimerResume:
@@ -163,6 +171,13 @@ export class Jumper extends BaseDevice<Jumper['traits']> {
       case CommandType.OnOff:
         this.customData.on = command.on;
         break;
+      // case CommandType.Locate:
+      //   console.log('Locate Shit', command);
+      //   break;
     }
+
+    const states = await this.getStatus();
+
+    return states;
   };
 }

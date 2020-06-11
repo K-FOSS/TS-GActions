@@ -7,6 +7,7 @@ import { RunCycleTrait } from './Traits/RunCycleTrait';
 import { TimerTrait } from './Traits/TimerTrait';
 import { ModesTrait } from './Traits/ModeTrait';
 import { SensorStateTrait } from './Traits/SensorStateTrait';
+import { LocatorTrait } from './Traits/LocatorTrait';
 
 export type Traits =
   | OnOffTrait
@@ -16,4 +17,5 @@ export type Traits =
   | SensorStateTrait
   | RunCycleTrait
   | TimerTrait
-  | ModesTrait;
+  | ModesTrait
+  | LocatorTrait;

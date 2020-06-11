@@ -24,6 +24,11 @@ export enum CommandType {
    * https://developers.google.com/assistant/smarthome/traits/modes#device-commands
    */
   SetMode = 'action.devices.commands.SetModes',
+
+  /**
+   * https://developers.google.com/assistant/smarthome/traits/locator#device-commands
+   */
+  Locate = 'action.devices.commands.Locate',
 }
 
 export abstract class BaseComamnd {

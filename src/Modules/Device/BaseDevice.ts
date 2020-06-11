@@ -52,5 +52,9 @@ export abstract class BaseDevice<T extends ReadonlyArray<Traits>> {
 
   public abstract executeCommand(
     command: T[number]['commands'][number],
-  ): Promise<void>;
+  ): Promise<
+    Partial<
+      Omit<Intersect<ObjectGet<T>[number]>, 'commands' | 'type' | 'attributes'>
+    >
+  >;
 }

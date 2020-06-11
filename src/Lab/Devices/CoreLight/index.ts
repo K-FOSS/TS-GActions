@@ -89,6 +89,9 @@ export class CoreLight extends BaseDevice<CoreLight['traits']> {
         break;
       case CommandType.appSelect:
         console.log('Select application: ', command);
+        break;
     }
+
+    return this.getStatus();
   };
 }

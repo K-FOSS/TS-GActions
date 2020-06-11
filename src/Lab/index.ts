@@ -6,6 +6,12 @@ import bodyParser from 'body-parser';
 import { registerAuthEndpoints } from './Auth';
 import { Jumper } from './Devices/Jumper';
 
+if (process.env.NODE_ENV !== 'production') {
+  const { config } = await import('dotenv');
+
+  config();
+}
+
 const webServer = express();
 webServer.use(bodyParser.json());
 webServer.use(bodyParser.urlencoded({ extended: true }));

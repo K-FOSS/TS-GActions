@@ -13,6 +13,7 @@ import {
   SmartHomeV1SyncResponse,
   SmartHomeV1DisconnectResponse,
   SmartHomeV1DisconnectRequest,
+  SmartHomeJwt,
 } from 'actions-on-google';
 import type {
   BuiltinFrameworkMetadata,
@@ -26,16 +27,25 @@ interface CreateControllerOptions<T> {
 }
 
 export class SmartHomeController<
-  T extends BaseDevice<ReadonlyArray<Traits>>[]
+  T extends ReadonlyArray<BaseDevice<Traits[]>>
 > {
   public devices: T;
 
   public smartHome: AppHandler & SmartHomeApp;
 
-  public static async createController<T extends BaseDevice<Traits[]>[]>({
-    devices,
-  }: CreateControllerOptions<T>): Promise<SmartHomeController<T>> {
-    const smartHome = smarthome();
+  public static async createController<
+    T extends ReadonlyArray<BaseDevice<any>>
+  >({ devices }: CreateControllerOptions<T>): Promise<SmartHomeController<T>> {
+    let jwt: SmartHomeJwt | undefined;
+
+    if (process.env.JWT_PATH) {
+      jwt = (await import(process.env.JWT_PATH)).default;
+    }
+
+    const smartHome = smarthome({
+      key: process.env.KEY,
+      jwt,
+    });
 
     const smartHomeController = new SmartHomeController<T>();
     smartHomeController.smartHome = smartHome;
@@ -48,6 +58,20 @@ export class SmartHomeController<
       smartHomeController.onDisconnect(...args),
     );
 
+    setInterval(async () => {
+      const data = await smartHomeController.getDeviceStatus();
+
+      smartHomeController.smartHome.reportState({
+        requestId: Math.random().toString(),
+        agentUserId: '544845',
+        payload: {
+          devices: {
+            states: Object.fromEntries(data),
+          },
+        },
+      });
+    }, 5000);
+
     return smartHomeController;
   }
 
@@ -56,11 +80,15 @@ export class SmartHomeController<
     headers: Headers,
     framework?: BuiltinFrameworkMetadata,
   ): Promise<SmartHomeV1ExecuteResponse> {
+    console.log('onExec: ', body.inputs[0].payload.commands[0], headers);
+
     const commands = await Promise.all(
       body.inputs.flatMap((execInput) => {
         return execInput.payload.commands.flatMap(({ devices, execution }) => {
           return devices.flatMap<Promise<SmartHomeV1ExecuteResponseCommands>>(
             async ({ id }) => {
+              let states = {};
+
               const localDevice = this.devices.find(
                 (device) => device.id === id,
               );
@@ -86,13 +114,14 @@ export class SmartHomeController<
 
                 Object.assign(deviceCommand, exec.params);
 
-                await localDevice.executeCommand(deviceCommand);
+                states = await localDevice.executeCommand(deviceCommand);
                 break;
               }
 
               return {
                 ids: [id],
                 status: 'SUCCESS',
+                states,
               };
             },
           );
@@ -108,27 +137,45 @@ export class SmartHomeController<
     };
   }
 
+  public async getDeviceStatus(
+    deviceIds?: string[],
+  ): Promise<[string, unknown][]> {
+    let devices: BaseDevice<ReadonlyArray<Traits>>[];
+
+    if (deviceIds) {
+      devices = deviceIds.flatMap((deviceId) => {
+        const localDevice = this.devices.find(
+          (device) => device.id === deviceId,
+        );
+        if (!localDevice) {
+          return [];
+        }
+
+        return localDevice;
+      });
+    } else {
+      devices = this.devices;
+    }
+
+    return Promise.all(
+      devices.map<Promise<[string, unknown]>>(async (localDevice) => [
+        localDevice.id,
+        await localDevice.getStatus(),
+      ]),
+    );
+  }
+
   public async onQuery(
     body: SmartHomeV1QueryRequest,
     headers: Headers,
     framework?: BuiltinFrameworkMetadata,
   ): Promise<SmartHomeV1QueryResponse> {
-    const devicePromises = body.inputs.flatMap(({ intent, payload }) =>
-      payload.devices.map(async ({ id }) => {
-        const localDevice = this.devices.find((device) => device.id === id);
-        if (!localDevice) {
-          console.log(`Can't find ${id}`);
-          return [];
-        }
-
-        return [id, await localDevice.getStatus()] as [string, unknown];
-      }),
-    );
+    console.log('onQuery', body);
 
     return {
       requestId: body.requestId,
       payload: {
-        devices: Object.fromEntries(await Promise.all(devicePromises)),
+        devices: Object.fromEntries(await this.getDeviceStatus()),
       },
     };
   }
@@ -164,11 +211,10 @@ export class SmartHomeController<
       },
     );
 
-    console.log('onSync: ', devices);
-
     return {
       requestId: body.requestId,
       payload: {
+        agentUserId: '544845',
         devices,
       },
     };

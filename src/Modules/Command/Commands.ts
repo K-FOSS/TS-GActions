@@ -9,6 +9,7 @@ import { TimerResumeCommand } from './Commands/TimerResumeCommand';
 import { TimerCancelCommand } from './Commands/TimerCancelCommand';
 import { SetModesCommand } from './Commands/SetModesCommand';
 import { TimerAdjustCommand } from './Commands/TimerAdjustCommand';
+import { LocateCommand } from './Commands/LocateCommand';
 
 export type Commands =
   | OnOffCommand
@@ -20,4 +21,5 @@ export type Commands =
   | TimerResumeCommand
   | TimerCancelCommand
   | TimerAdjustCommand
-  | SetModesCommand;
+  | SetModesCommand
+  | LocateCommand;
