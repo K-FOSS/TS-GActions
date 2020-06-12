@@ -1,9 +1,7 @@
 // src/Lab/index.ts
+import { createFastifyServer } from './Library/Fastify';
 import { SmartHomeController } from '../Modules/SmartHome';
 import { CoreLight } from './Devices/CoreLight';
-import express from 'express';
-import bodyParser from 'body-parser';
-import { registerAuthEndpoints } from './Auth';
 import { Jumper } from './Devices/Jumper';
 
 if (process.env.NODE_ENV !== 'production') {
@@ -12,16 +10,25 @@ if (process.env.NODE_ENV !== 'production') {
   config();
 }
 
-const webServer = express();
-webServer.use(bodyParser.json());
-webServer.use(bodyParser.urlencoded({ extended: true }));
+const webServer = await createFastifyServer();
 
 const smartHomeController = await SmartHomeController.createController({
   devices: [new CoreLight(), new Jumper()],
 });
 
-webServer.post('/fulfillment', smartHomeController.smartHome);
+webServer.all('/fulfillment*', async (request, reply) => {
+  const smartHomeReply = await smartHomeController.smartHome.handler(
+    request.body,
+    request.headers,
+  );
 
-await registerAuthEndpoints(webServer);
+  reply.status(smartHomeReply.status);
 
-webServer.listen(3000);
+  if (smartHomeReply.headers) {
+    reply.headers(smartHomeReply.headers);
+  }
+
+  return smartHomeReply.body;
+});
+
+await webServer.listen(3000, '0.0.0.0');

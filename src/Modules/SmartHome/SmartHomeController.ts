@@ -45,6 +45,7 @@ export class SmartHomeController<
     const smartHome = smarthome({
       key: process.env.KEY,
       jwt,
+      debug: true,
     });
 
     const smartHomeController = new SmartHomeController<T>();
@@ -73,6 +74,34 @@ export class SmartHomeController<
     }, 5000);
 
     return smartHomeController;
+  }
+
+  public async getDeviceStatus(
+    deviceIds?: string[],
+  ): Promise<[string, unknown][]> {
+    let devices: SmartHomeController<T>['devices'];
+
+    if (deviceIds) {
+      devices = deviceIds.flatMap((deviceId) => {
+        const localDevice = this.devices.find(
+          (device) => device.id === deviceId,
+        );
+        if (!localDevice) {
+          return [];
+        }
+
+        return localDevice;
+      });
+    } else {
+      devices = this.devices;
+    }
+
+    return Promise.all(
+      devices.map<Promise<[string, unknown]>>(async (localDevice) => [
+        localDevice.id,
+        await localDevice.getStatus(),
+      ]),
+    );
   }
 
   public async onExecute(
@@ -135,34 +164,6 @@ export class SmartHomeController<
         commands,
       },
     };
-  }
-
-  public async getDeviceStatus(
-    deviceIds?: string[],
-  ): Promise<[string, unknown][]> {
-    let devices: BaseDevice<ReadonlyArray<Traits>>[];
-
-    if (deviceIds) {
-      devices = deviceIds.flatMap((deviceId) => {
-        const localDevice = this.devices.find(
-          (device) => device.id === deviceId,
-        );
-        if (!localDevice) {
-          return [];
-        }
-
-        return localDevice;
-      });
-    } else {
-      devices = this.devices;
-    }
-
-    return Promise.all(
-      devices.map<Promise<[string, unknown]>>(async (localDevice) => [
-        localDevice.id,
-        await localDevice.getStatus(),
-      ]),
-    );
   }
 
   public async onQuery(
