@@ -4,16 +4,11 @@ import { TraitType } from '../TraitType';
 import { ArrayType } from '@k-foss/ts-gactions/Utils/types';
 import { AppInstallCommand } from '../../Command/Commands/AppInstallCommand';
 import { AppSelectCommand } from '../../Command/Commands/AppSelectCommand';
+import { Name } from '../../Language/Name';
 
-interface ApplicationName {
-  /**
-   * User-friendly synonyms for the application name for a given language. The first synonym is used in the response.
-   */ // eslint-disable-next-line camelcase
-  name_synonym: string[];
-
-  lang: string;
-}
-
+/**
+ * Application that users of this device can interact with.
+ */
 export interface Application {
   /**
    * 	Unique key for the application which is not exposed to users in speech or response.
@@ -23,8 +18,9 @@ export interface Application {
   /**
    * Name of each application and its language-specific synonyms.
    */
-  names: ApplicationName[];
+  names: Name[];
 }
+
 interface Attributes {
   /**
    * A list of applications. Each application has one or

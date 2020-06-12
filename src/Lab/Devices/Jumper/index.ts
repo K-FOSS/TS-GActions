@@ -6,6 +6,9 @@ import { TimerTrait } from '@k-foss/ts-gactions/Modules/Trait/Traits/TimerTrait'
 import { CommandType } from '@k-foss/ts-gactions/Modules/Command/BaseCommand';
 import { ModesTrait } from '@k-foss/ts-gactions/Modules/Trait/Traits/ModeTrait';
 import { OnOffTrait } from '@k-foss/ts-gactions/Modules/Trait';
+import { ToggleTrait } from '@k-foss/ts-gactions/Modules/Trait/Traits/ToggleTrait';
+import { ObjectGet } from '@k-foss/ts-gactions/Utils/types';
+import { Language } from '@k-foss/ts-gactions/Modules/Language';
 
 interface CustomData {
   timer?: NodeJS.Timeout;
@@ -14,6 +17,8 @@ interface CustomData {
   timerRemainingSec: number;
 
   modeSetting: ObjectGet<Record<string, unknown>>;
+
+  currentToggleSettings: Record<string, boolean>;
 
   on: boolean;
 }
@@ -71,6 +76,17 @@ export class Jumper extends BaseDevice<Jumper['traits']> {
         ordered: true,
       },
     ],
+    availableToggles: [
+      {
+        name: 'safety',
+        name_values: [
+          {
+            lang: Language.English,
+            name_synonym: ['Safety Mode'],
+          },
+        ],
+      },
+    ],
     commandOnlyTimer: false,
     maxTimerLimitSec: 60000,
     commandOnlyModes: false,
@@ -82,12 +98,16 @@ export class Jumper extends BaseDevice<Jumper['traits']> {
     new TimerTrait(),
     new ModesTrait(),
     new OnOffTrait(),
+    new ToggleTrait(),
   ] as const;
 
   public customData: CustomData = {
     timerPaused: false,
     timer: undefined,
     timerRemainingSec: -1,
+    currentToggleSettings: {
+      safety: true,
+    },
     modeSetting: {
       distance: '1h',
     },
@@ -141,6 +161,9 @@ export class Jumper extends BaseDevice<Jumper['traits']> {
       timerRemainingSec: this.customData.timerRemainingSec,
       currentModeSettings: this.customData.modeSetting,
       on: this.customData.on,
+      currentToggleSettings: {
+        safety: true,
+      },
     };
   };
 
@@ -171,6 +194,8 @@ export class Jumper extends BaseDevice<Jumper['traits']> {
       case CommandType.OnOff:
         this.customData.on = command.on;
         break;
+      case CommandType.SetToggles:
+        this.customData.currentToggleSettings = command.updateToggleSettings;
       // case CommandType.Locate:
       //   console.log('Locate Shit', command);
       //   break;

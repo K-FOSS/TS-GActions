@@ -29,6 +29,11 @@ export enum CommandType {
    * https://developers.google.com/assistant/smarthome/traits/locator#device-commands
    */
   Locate = 'action.devices.commands.Locate',
+
+  /**
+   * https://developers.google.com/assistant/smarthome/traits/toggles#device-commands
+   */
+  SetToggles = 'action.devices.commands.SetToggles',
 }
 
 export abstract class BaseComamnd {

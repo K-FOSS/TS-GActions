@@ -1,5 +1,5 @@
 // src/Modules/Device/BaseDevice.ts
-import { ObjectGet } from '../../Utils/types';
+import { ObjectGet, Intersect } from '../../Utils/types';
 import { Traits } from '../Trait';
 import { DeviceType } from './Device';
 import { DeviceInfo } from './DeviceInfo';

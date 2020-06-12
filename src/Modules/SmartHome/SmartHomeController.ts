@@ -59,19 +59,19 @@ export class SmartHomeController<
       smartHomeController.onDisconnect(...args),
     );
 
-    setInterval(async () => {
-      const data = await smartHomeController.getDeviceStatus();
+    // setInterval(async () => {
+    //   const data = await smartHomeController.getDeviceStatus();
 
-      smartHomeController.smartHome.reportState({
-        requestId: Math.random().toString(),
-        agentUserId: '544845',
-        payload: {
-          devices: {
-            states: Object.fromEntries(data),
-          },
-        },
-      });
-    }, 5000);
+    //   smartHomeController.smartHome.reportState({
+    //     requestId: Math.random().toString(),
+    //     agentUserId: '544845',
+    //     payload: {
+    //       devices: {
+    //         states: Object.fromEntries(data),
+    //       },
+    //     },
+    //   });
+    // }, 5000);
 
     return smartHomeController;
   }
